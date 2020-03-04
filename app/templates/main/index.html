@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    {% if current_user.is_authenticated %}
+    <form method="POST" action="">
+        {{ form.hidden_tag() }}
+        <p>
+        {{ form.destination.label }}<br>
+        {{ form.destination() }}
+        </p>
+        <p>
+        {{ form.start_date.label }}<br>
+        {{ form.start_date() }}
+        </p>
+        {% if current_user.is_admin() %}
+        <p>
+        {{ form.admin_own_arrangements() }}
+        {{ form.admin_own_arrangements.label }}
+        </p>
+        <p>
+        {{ form.admin_no_guide_arrangements() }}
+        {{ form.admin_no_guide_arrangements.label }}
+        </p>
+        {% endif %}
+        {{ form.search() }}
+        {{ form.reset() }}
+    </form>
+    <hr>
+    {% endif %}
+    {% if arrangements %}
+        {% for arrangement in arrangements %}
+            {% include '_arrangement.html' %}
+            {% include '_url.html' %}
+            <br>
+            <br>
+        {% endfor %}
+    {% endif %}
+{% endblock %}

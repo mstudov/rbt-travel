@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<p>Location: {{ arrang.location }}</p>
+<p>Description: {{ arrang.description }}</p>
+<p>Time: {{ arrang.start_date }} - {{ arrang.end_date }}</p>
+<p>Price: {{ arrang.price }}</p>
+<p>Available spots: {{ arrang.avl_spots }}</p>
+<p>Free spots: {{ arrang.avl_spots }}</p>
+<a href="{{ url_for('main.index', p=-100, id=-100) }}">Back</a>
+{% endblock %}

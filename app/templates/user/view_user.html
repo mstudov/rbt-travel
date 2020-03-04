@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <table>
+        <tr valign="top">
+            <td><img src="{{ user.avatar(100) }}"></td>
+            <td>
+                <h3>User: {{ user.username }}</h1>
+                <h3>Name: {{ user.first_name }} {{ user.last_name }} </h1>
+                {% if user == current_user %}
+                <p><a href="{{ url_for('user.edit_profile') }}">Edit your profile</a></p>
+                {% endif %}
+            </td>
+        </tr>
+    </table>
+    <hr>
+    {% if arrangements %}
+    {% for arrangement in arrangements %}
+        {% include '_arrangement.html' %}
+        <br>
+    {% endfor %}
+    {% endif %}
+{% endblock %}

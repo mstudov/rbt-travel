@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    {% if arrangements %}
+    <table style="width:50%">
+        {% for arrangement in arrangements %}
+            {% with a1 = arrangement[0], a2 = arrangement[1] %}
+                <tr>
+                    <td>{{ a1.location }}</td>
+                    <td>{{ a2.first_name }} {{ a2.last_name }}</td>
+                    <td><a href="{{ url_for('arrangement.request_guide_position', id=a1.id, guide_id=a2.get_guide().id) }}">Approve</a></td>
+                </tr>
+            {% endwith %}
+        {% endfor %}
+    </table>
+    {% endif %}
+{% endblock %}

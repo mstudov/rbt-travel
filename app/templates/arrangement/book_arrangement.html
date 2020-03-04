@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+Location: {{ arrangement.location }}
+<br>
+Price: {{ arrangement.price }}<br>
+Date: {{ arrangement.start_date }} - {{ arrangement.end_date }} ({{ (arrangement.end_date-arrangement.start_date).days }})<br>
+Created by: <div style="font-weight: bold; display: inline;">{{ arrangement.admin.user.username }}</div><br>
+Guide: <div style="font-weight: bold; display: inline;">
+{% if arrangement.guide %}
+{{ arrangement.guide.user.username }}
+{% else %}
+N/A
+{% endif %}
+</div><br>
+Available spots: {{ arrangement.avl_spots }}
+<form method="POST" action="">
+    {{ form.hidden_tag() }}
+
+    <p>
+        {{ form.book_spots.label }}<br>
+        {{ form.book_spots(size=5) }}
+        {% for error in form.book_spots.errors %}
+        <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </p>
+    <p>{{ form.submit() }}</p>
+</form>
+
+{% endblock %}

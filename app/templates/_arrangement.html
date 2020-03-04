@@ -1,0 +1,16 @@
+    <table>
+        <tr valign="top">
+            Location: {{ arrangement.location }}
+            <br>
+            Price: {{ arrangement.price }}<br>
+            Date: {{ arrangement.start_date }} - {{ arrangement.end_date }} ({{ (arrangement.end_date-arrangement.start_date).days }})<br>
+            Created by: <div style="font-weight: bold; display: inline;">{{ arrangement.admin.user.username }}</div><br>
+            Guide: <div style="font-weight: bold; display: inline;">
+            {% if arrangement.guide %}
+            {{ arrangement.guide.user.username }}
+            {% else %}
+            N/A
+            {% endif %}
+            </div><br>
+    </tr>
+</table>

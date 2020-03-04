@@ -1,0 +1,17 @@
+<a href="{{ url_for('arrangement.view_arrangement', id=arrangement.id) }}">View</a>
+{% if current_user.is_authenticated %}
+<span>
+{% if current_user.is_tourist() %}
+<a href="{{ url_for('arrangement.book_arrangement', id=arrangement.id) }}">Book</a>
+{% endif %}
+{% if current_user.is_guide() %}
+<a href="{{ url_for('arrangement.request_guide_position', id=arrangement.id) }}">Request to be guide</a>
+{% endif %}
+{% if (current_user.is_guide() or current_user.is_admin()) and (arrangement.admin.user == current_user or arrangement.guide.user == current_user) %}
+<a href="{{ url_for('arrangement.edit_arrangement', id=arrangement.id) }}">Edit</a>
+{% endif %}
+{% if arrangement.admin.user == current_user %}
+<a href="{{ url_for('arrangement.delete_arrangement', id=arrangement.id) }}">Delete</a>
+{% endif %}
+</span>
+{% endif %}
