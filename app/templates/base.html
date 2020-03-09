@@ -5,6 +5,9 @@
         {% else %}
         <title>Travel Finder</title>
         {% endif %}
+        <style>
+        {% block style %}{% endblock %}
+        </style>
     </head>
     <body>
         {% if current_user.is_authenticated %}

@@ -1,8 +1,23 @@
 {% extends 'base.html' %}
 
+{% block style %}
+table {
+  width: 50%;
+}
+
+td, th {
+  text-align: left;
+  padding: 8px;
+}
+{% endblock %}
+
 {% block content %}
     {% if arrangements %}
-    <table style="width:50%">
+    <table>
+        <tr>
+            <th>Location</th>
+            <th>Guide's name</th>
+        </tr>
         {% for arrangement in arrangements %}
             {% with a1 = arrangement[0], a2 = arrangement[1] %}
                 <tr>
@@ -13,5 +28,11 @@
             {% endwith %}
         {% endfor %}
     </table>
+    {% if prev_url %}
+    <a href="{{ prev_url }}">Previous</a>
+    {% endif %}
+    {% if next_url %}
+    <a href="{{ next_url }}">Next</a>
+    {% endif %}
     {% endif %}
 {% endblock %}

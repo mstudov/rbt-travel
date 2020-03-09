@@ -7,4 +7,4 @@ class Config(object):
     SQLALCHEMY_DATABASE_URI = 'sqlite:///{}'.format(
                                     os.path.join(basedir, 'app.db'))
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    RESULTS_PER_PAGE = 10
+    RESULTS_PER_PAGE = 5

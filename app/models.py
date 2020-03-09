@@ -156,9 +156,8 @@ class TouristUser(db.Model):
                  TravelArrangementTouristUser.tourist_user_id==self.id)) \
                     .count() > 0
 
-    # TODO: Returns arrangements with 0 available spots
-    #   fix: add column to `travel_arrangement` table that counts reserved spots
-    def get_arrangements(self):
+    # returns arrangements that I didn't book yet
+    def get_arrangements_query(self):
         #SELECT *
         #FROM travel_arrangement TA
         #LEFT JOIN travel_arrangement_tourist_user TT ON (TT.travel_arrangement_id=TA.id AND TT.tourist_user_id=1)
@@ -168,12 +167,13 @@ class TouristUser(db.Model):
             and_(TravelArrangementTouristUser \
                     .travel_arrangement_id==TravelArrangement.id,
                  TravelArrangementTouristUser.tourist_user_id==self.id)).filter(
-                    #and_(True,
                     and_(TravelArrangement.start_date > date.today(),
                          TravelArrangementTouristUser.tourist_user_id==None,
                          TravelArrangement.avl_spots > 0)) \
-                            .order_by(TravelArrangement.start_date.desc()).all()
+                            .order_by(TravelArrangement.start_date.desc())
                         
+    def get_arrangements(self):
+        return self.get_arrangements_query().all()
 
 class GuideUser(db.Model):
     __tablename__ = 'guide_users'
@@ -186,9 +186,10 @@ class GuideUser(db.Model):
     arrangements = db.relationship('TravelArrangement', lazy='dynamic',
         back_populates='guide')
 
-    # TODO: Filter out travel arrangement guide requests only if they are not
-    # declined by the administrator.
-    def get_arrangements(self):
+    # returns all the arrangements that I didn't request guide position for
+    def get_arrangements_query(self):
+        # TODO: Filter out travel arrangement guide requests only if they are not
+        # declined by the administrator. ( ??? )
         ##SELECT * FROM travel_arrangement T
         ##LEFT JOIN guide_user_response G ON (G.travel_arrangement_id=T.id and G.guide_id=4)
         ##WHERE T.guide_id is NULL and G.id is NULL
@@ -202,7 +203,10 @@ class GuideUser(db.Model):
                     GuideUserResponse.id==None)).order_by(
                         TravelArrangement.start_date.desc()).distinct(
                             GuideUserResponse.travel_arrangement_id,
-                            GuideUserResponse.guide_id).all()
+                            GuideUserResponse.guide_id)
+
+    def get_arrangements(self):
+        return self.get_arrangements_query().all()
 
     def request_guide_position(self, arrangement):
         if not arrangement and arrangement.guide is not None:
@@ -225,7 +229,8 @@ class AdminUser(db.Model):
         order_by='desc(TravelArrangement.start_date)',
         back_populates='admin', uselist=True)
     
-    def get_arrangements(self):
+    # returns my arrangements for which guides requested the guide position
+    def get_arrangements_query(self):
         #SELECT T.*, U.* FROM travel_arrangements T
         #JOIN guide_user_responses R ON R.travel_arrangement_id=T.id
         #JOIN guide_users G ON R.guide_id=G.id
@@ -239,7 +244,11 @@ class AdminUser(db.Model):
                         TravelArrangement.admin_id==self.id,
                         TravelArrangement.guide_id==None)).order_by(
                             TravelArrangement.id).add_entity(
-                                User).all()
+                                User)
+
+    def get_arrangements(self):
+        return self.get_arrangements_query().all()
+
 
 class TravelArrangement(db.Model):
     __tablename__ = 'travel_arrangements'

@@ -1,4 +1,5 @@
 from flask import (
+    current_app,
     render_template,
     request,
     redirect,
@@ -40,12 +41,21 @@ def index():
     elif request.method == 'GET':
         if current_user.is_anonymous or current_user.is_admin():
             arrangs = TravelArrangement.query.order_by(
-                TravelArrangement.start_date.desc()).all()
+                TravelArrangement.start_date.desc())
         elif current_user.is_tourist():
-            arrangs = current_user.get_tourist().get_arrangements()
+            arrangs = current_user.get_tourist().get_arrangements_query()
         elif current_user.is_guide():
-            arrangs = current_user.get_guide().get_arrangements()
-    return render_template('main/index.html', form=form, arrangements=arrangs)
+            arrangs = current_user.get_guide().get_arrangements_query()
+
+        page = request.args.get('page', 1, type=int)
+        arrangs = arrangs.paginate(page,
+            current_app.config['RESULTS_PER_PAGE'], False)
+        next_url = url_for('main.index', page=arrangs.next_num) \
+            if arrangs.has_next else None
+        prev_url = url_for('main.index', page=arrangs.prev_num) \
+            if arrangs.has_prev else None
+    return render_template('main/index.html', form=form,
+        arrangements=arrangs.items, next_url=next_url, prev_url=prev_url)
 
 @blueprint.route('/unauthorized/')
 def unauthorized():

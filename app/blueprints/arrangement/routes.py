@@ -1,6 +1,7 @@
 from app.extensions import db
 
 from flask import (
+    current_app,
     render_template,
     request,
     redirect,
@@ -37,7 +38,7 @@ def create_arrangement():
         db.session.add(arrang)
         db.session.commit()
         flash('New travel arrangement created.')
-        return redirect(url_for('main.index'))
+        #return redirect(url_for('main.index'))
     return render_template('arrangement/create_arrangement.html', form=form)
 
 @blueprint.route('/<int:id>/edit/', methods=['GET', 'POST'])
@@ -139,7 +140,7 @@ def request_guide_position(id):
         user = guide.user
         flash('{} {} is a new guide for a travel arrangement to {}.'.format(
             user.first_name, user.last_name, arrang.location))
-        return redirect(url_for('main.index'))
+        return redirect(url_for('arrangement.approve_guide_requests'))
     else:
         flash('You can\'t modify arrangement that you didn\'t created!')
         return redirect(url_for('main.unauthorized'))
@@ -148,6 +149,18 @@ def request_guide_position(id):
 @login_required
 @requires_role(roles=[Role.ADMIN])
 def approve_guide_requests():
-#def arrangement_guide_approve():
-    arrangs = current_user.get_admin().get_arrangements()
-    return render_template('arrangement/approve_guide_requests.html', arrangements=arrangs)
+    page = request.args.get('page', 1, type=int)
+    arrangs = current_user.get_admin().get_arrangements_query().order_by(
+        TravelArrangement.id).paginate(
+            page,
+            current_app.config['RESULTS_PER_PAGE'],
+            False)
+    next_url = url_for('arrangement.approve_guide_requests',
+        page=arrangs.next_num) if arrangs.has_next else None
+    prev_url = url_for('arrangement.approve_guide_requests',
+        page=arrangs.prev_num) if arrangs.has_prev else None
+    return render_template(
+        'arrangement/approve_guide_requests.html',
+        arrangements=arrangs.items,
+        next_url=next_url,
+        prev_url=prev_url)

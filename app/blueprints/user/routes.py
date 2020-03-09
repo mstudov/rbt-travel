@@ -1,4 +1,5 @@
 from flask import (
+    current_app,
     render_template,
     request,
     redirect,
@@ -12,7 +13,14 @@ from app.extensions import db
 from app.blueprints.user import blueprint
 from app.blueprints.user.forms import NewUserForm, EditProfileForm
 #from app.user.models import User, TouristUser, AdminUser, GuideUser
-from app.models import User, TouristUser, AdminUser, GuideUser
+from app.models import (
+    User,
+    TouristUser,
+    AdminUser,
+    GuideUser,
+    TravelArrangement,
+    TravelArrangementTouristUser
+)
 from app.permissions import Role, requires_role
 
 @blueprint.route('/create/', methods=['GET', 'POST'])
@@ -45,16 +53,42 @@ def view_profile(id):
     user = User.query.filter_by(id=id).first_or_404() if id is not None \
         else current_user
 
-    arrangs = None
+    # TODO: Use relationships instead of manually quering the database
     if user == current_user and current_user.is_tourist():
-        arrangs = user.get_tourist().arrangements
+        #arrangs = user.get_tourist().arrangements
+        arrangs = TravelArrangement.query.join(
+            TravelArrangementTouristUser,
+            TravelArrangementTouristUser.\
+                travel_arrangement_id==TravelArrangement.id).filter(
+                    TravelArrangementTouristUser.\
+                        tourist_user_id==current_user.get_tourist().id).\
+                            order_by(TravelArrangement.start_date.desc())
     elif user == current_user and current_user.is_guide():
-        # TODO: Returns query, not results ?! lazy='dynamic' !!!
-        arrangs = user.get_guide().arrangements
+        #arrangs = user.get_guide().arrangements
+        arrangs = TravelArrangement.query.join(
+            GuideUser, TravelArrangement.guide_id==GuideUser.id).order_by(
+                TravelArrangement.start_date.desc())
+    else:
+        arrangs = None
+        next_url = None
+        prev_url = None
+
+    if arrangs:
+        page = request.args.get('page', 1, type=int)
+        arrangs = arrangs.paginate(
+            page,
+            current_app.config['RESULTS_PER_PAGE'],
+            False)
+        next_url = url_for('user.view_profile', page=arrangs.next_num) \
+            if arrangs.has_next else None
+        prev_url = url_for('user.view_profile', page=arrangs.prev_num) \
+            if arrangs.has_prev else None
+        arrangs = arrangs.items
 
     return render_template('user/view_user.html', 
                            user=user,
-                           arrangements=arrangs)
+                           arrangements=arrangs,
+                           next_url=next_url, prev_url=prev_url)
 
 @blueprint.route('/edit/', methods=['GET', 'POST'])
 @login_required
