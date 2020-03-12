@@ -31,7 +31,7 @@ def create_arrangement():
            description=form.description.data,
            location=form.location.data,
            price=form.price.data,
-           avl_spots=form.avl_spots.data,
+           total_spots=form.total_spots.data,
            admin_id=current_user.get_admin().id)
         if form.guide.data != -1:
             arrang.guide_id = form.guide.data
@@ -59,7 +59,7 @@ def edit_arrangement(id):
             arrang.end_date = form.end_date.data
             arrang.location = form.location.data
             arrang.price = form.price.data
-            arrang.avl_spots = form.avl_spots.data
+            arrang.total_spots = form.total_spots.data
             arrang.guide_id = form.guide.data if form.guide.data != -1 else None
         arrang.description = form.description.data
         db.session.commit()
@@ -71,7 +71,7 @@ def edit_arrangement(id):
             form.end_date.data = arrang.end_date
             form.location.data = arrang.location
             form.price.data = arrang.price
-            form.avl_spots.data = arrang.avl_spots
+            form.total_spots.data = arrang.total_spots
             form.guide.data = arrang.guide.id if arrang.guide is not None \
                 else -1
         form.description.data = arrang.description

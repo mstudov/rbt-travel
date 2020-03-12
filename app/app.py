@@ -1,7 +1,7 @@
 from flask import Flask
 from config import Config
 
-from app.blueprints import auth, main, user, arrangement
+from app.blueprints import auth, main, user, arrangement, api
 from app.extensions import login_manager, migrate, db
 from app.permissions import Role
 
@@ -24,6 +24,7 @@ def register_blueprints(app):
     app.register_blueprint(main.blueprint)
     app.register_blueprint(user.blueprint)
     app.register_blueprint(arrangement.blueprint)
+    app.register_blueprint(api.blueprint)
     return None
 
 def register_shellcontext(app):

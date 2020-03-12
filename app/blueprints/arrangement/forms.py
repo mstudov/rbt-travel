@@ -21,7 +21,7 @@ class CreateArrangementForm(FlaskForm):
     description = TextAreaField('Description')
     location = StringField('Location', validators=[DataRequired()]) 
     price = IntegerField('Price', validators=[DataRequired()]) 
-    avl_spots = IntegerField('Available spots', validators=[DataRequired()]) 
+    total_spots = IntegerField('Total spots', validators=[DataRequired()]) 
     guide = SelectField('Select guide', coerce=int) 
     submit = SubmitField('Create')
 

@@ -1,0 +1,2 @@
+1.Column "total_spots" in "travel_arrangements" table is EMPTY !!!
+
